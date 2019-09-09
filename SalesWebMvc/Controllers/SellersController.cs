@@ -68,5 +68,22 @@ namespace SalesWebMvc.Controllers
             _sellerService.Remove(id);
             return RedirectToAction(nameof(Index));
         }
+
+        //GET: Seller/Details
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var objSeller = _sellerService.FindById(id.Value);
+            if (objSeller == null)
+            {
+                return NotFound();
+            }
+
+            return View(objSeller);
+        }
     }
 }
