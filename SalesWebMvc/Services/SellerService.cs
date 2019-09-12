@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SalesWebMvc.Services.Exception;
+using SalesWebMvc.Services.Exceptions;
 
 namespace SalesWebMvc.Services
 {
@@ -35,10 +35,19 @@ namespace SalesWebMvc.Services
 
         public async Task RemoveAsync(int id)
         {
+            /* Commenting on code to maintain DB integrity.
             var obj = await _context.Seller.Include(x => x.Sales).FirstOrDefaultAsync(x => x.Id == id);
-            _context.SalesRecord.RemoveRange(obj.Sales);
-            _context.Seller.Remove(obj);
-            await _context.SaveChangesAsync();
+            _context.SalesRecord.RemoveRange(obj.Sales); */
+            try
+            {
+                var obj = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(obj);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                throw new IntegrityException(e.Message);
+            } 
         }
 
         public async Task UpdateAsync(Seller obj)
