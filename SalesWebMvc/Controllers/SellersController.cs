@@ -39,9 +39,15 @@ namespace SalesWebMvc.Controllers
         // POST: Seller/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Seller seller)
+        public IActionResult Create(Seller objSeller)
         {
-            _sellerService.Insert(seller);
+            if (!ModelState.IsValid)
+            {
+                var departments = _departmentService.FindAll();
+                var viewModel = new SellerFormViewModel { Seller = objSeller, Departments = departments };
+                return View(viewModel);
+            }
+            _sellerService.Insert(objSeller);
             return RedirectToAction(nameof(Index));
         }
 
@@ -110,15 +116,21 @@ namespace SalesWebMvc.Controllers
         // POST: Seller/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Seller seller)
+        public IActionResult Edit(int id, Seller objSeller)
         {
-            if (id != seller.Id)
+            if (!ModelState.IsValid)
+            {
+                var departments = _departmentService.FindAll();
+                var viewModel = new SellerFormViewModel { Seller = objSeller, Departments = departments };
+                return View(viewModel);
+            }
+            if (id != objSeller.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch." });
             }
             try
             {
-                _sellerService.Update(seller);
+                _sellerService.Update(objSeller);
                 return RedirectToAction(nameof(Index));
             }
             catch (ApplicationException e)
